@@ -1,6 +1,7 @@
 import re
 from typing import Callable
 from functools import wraps
+from colorama import Fore, Back, Style
 
 """Parse user input and return command and arguments."""
 def parse_input(user_input):
@@ -15,11 +16,11 @@ def input_error(func: Callable) -> Callable:
         try:
             return func(*args, **kwargs)
         except IndexError:
-            return "Error: Missing arguments"
+            return Fore.RED + "Error: Missing arguments" + Style.RESET_ALL
         except KeyError as e:
-            return "Error: Contact not found: " + str(e)
+            return Fore.RED + "Error: Contact not found: " + str(e) + Style.RESET_ALL
         except ValueError as e:
-            return "Error: Invalid value: " + str(e)
+            return Fore.RED + "Error: Invalid value: " + str(e) + Style.RESET_ALL
     return wrapper
 
 """Add a new contact to the contacts dictionary."""
@@ -31,10 +32,10 @@ def add_contact(args, contacts):
     if not re.match(r"^[\d\+\-\(\)\s]+$", phone) or len(phone) < 5: #Match one or more characters that are digits, plus signs, hyphens, parentheses, or whitespace
         raise ValueError("phone number should contain only digits, spaces, and these symbols: + - ( )")
     if name in contacts:
-        return "Contact already exists, for update use the 'change' command."
+        return Fore.YELLOW + "Contact already exists, for update use the 'change' command." + Style.RESET_ALL
 
     contacts[name] = phone
-    return "Contact added."
+    return Fore.GREEN + "Contact added." + Style.RESET_ALL
 
 """Change an existing contact's phone number."""
 @input_error
@@ -42,7 +43,7 @@ def change_contact(args, contacts):
     name = args[0]
     phone = args[1]
     contacts[name] = phone
-    return "Contact updated."
+    return Fore.GREEN + "Contact updated." + Style.RESET_ALL
 
 """Show phone number for a specific contact."""
 @input_error
@@ -53,7 +54,7 @@ def show_phone(args, contacts):
 """Show all contacts."""
 def show_all(contacts):
     if not contacts:
-        return "No contacts saved."
+        return Fore.YELLOW + "No contacts saved."
     result = []
     for name, phone in contacts.items():
         result.append(f"{name}: {phone}")
@@ -63,7 +64,7 @@ def show_all(contacts):
 """Main function to run the bot assistant for managing contacts."""
 def main():
     contacts = {}
-    print("Welcome to the assistant bot!")
+    print(Fore.BLUE + "Welcome to the assistant bot!")
     print("Here you can manage your contacts. Available commands:")
     print(" command | parameters     | description                   |")
     print("---------|----------------|-------------------------------|")
@@ -71,7 +72,7 @@ def main():
     print(" change  | <name> <phone> | changes an existing contact   |")
     print(" phone   | <name>         | shows a contact's phone number|")
     print(" all     |                | shows all contacts            |")
-    print(" exit    |                | closes the bot                |")
+    print(" exit    |                | closes the bot                |" + Style.RESET_ALL)
 
     while True:
         user_input = input("Enter a command: ").strip()
@@ -95,7 +96,7 @@ def main():
         elif command == "all":
             print(show_all(contacts))
         else:
-            print("Invalid command.")
+            print(Fore.RED + "Invalid command." + Style.RESET_ALL)
 
 if __name__ == "__main__":
     main()
